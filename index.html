@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Reservation System</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #004aad;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #004aad;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 10px;
+      margin: 5px 0;
+      width: calc(100% - 22px);
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #004aad;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #003080;
+    }
+
+    pre {
+      background: #eee;
+      padding: 15px;
+      border-radius: 5px;
+      overflow: auto;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 600px) {
+      .input-row {
+        display: flex;
+        gap: 10px;
+      }
+      .input-row .input-group {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🚆 Train Reservation System</h1>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Reserve a Seat</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Name</label>
+          <input id="name" placeholder="Enter name" type="text" />
+        </div>
+        <div class="input-group">
+          <label>ID</label>
+          <input id="id" placeholder="Enter ID" type="text" />
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group">
+          <label>Age</label>
+          <input id="age" placeholder="Enter age" type="number" />
+        </div>
+        <div class="input-group">
+          <label>Priority</label>
+          <input id="priority" placeholder="Enter priority (0 default)" type="number" />
+        </div>
+      </div>
+      <button onclick="reserve()">Reserve</button>
+    </div>
+
+    <div class="card">
+      <h2>Cancel a Reservation</h2>
+      <div class="input-group">
+        <label>Passenger ID</label>
+        <input id="cancel_id" placeholder="Enter Passenger ID" type="text" />
+      </div>
+      <button onclick="cancel()">Cancel</button>
+    </div>
+
+    <div class="card">
+      <h2>Reservation Status</h2>
+      <button onclick="getStatus()">Refresh Status</button>
+      <pre id="status_output">Click "Refresh Status" to see current reservations.</pre>
+    </div>
+  </main>
+
+  <script>
+    const apiBase = "https://your-backend-url.onrender.com"; // Replace with your actual Flask backend URL
+
+    async function reserve() {
+      const payload = {
+        name: document.getElementById("name").value,
+        id: document.getElementById("id").value,
+        age: parseInt(document.getElementById("age").value),
+        priority: parseInt(document.getElementById("priority").value) || 0
+      };
+      const res = await fetch(`${apiBase}/reserve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      alert(JSON.stringify(data, null, 2));
+    }
+
+    async function cancel() {
+      const pid = document.getElementById("cancel_id").value;
+      const res = await fetch(`${apiBase}/cancel`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: pid })
+      });
+      const data = await res.json();
+      alert(JSON.stringify(data, null, 2));
+    }
+
+    async function getStatus() {
+      const res = await fetch(`${apiBase}/status`);
+      const data = await res.json();
+      document.getElementById("status_output").textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+
+</body>
+</html>
